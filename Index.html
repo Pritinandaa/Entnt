@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ERP System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f8f8;
+    }
+
+    header {
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    nav {
+      background-color: #555;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    nav li {
+      margin: 0 15px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #4CAF50;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    section {
+      margin: 20px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #333;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    button.primary {
+      background-color: #007bff;
+    }
+
+    button.primary:hover {
+      background-color: #0056b3;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    /* Calendar styles */
+    .calendar {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      table-layout: unset;
+    }
+    .due-date {
+      background-color: #ffcccc; /* Light red background for due dates */
+    }
+
+
+    .calendar th,
+    .calendar td {
+      width: 14.28%;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .calendar th {
+      background-color: #333;
+      color: #fff;
+    }
+
+    .calendar td {
+      border: 1px solid #ddd;
+      cursor: pointer;
+    }
+
+    .calendar td:hover {
+      background-color: #f0f0f0;
+    }
+
+    .selected-day {
+      background-color: #007bff;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>ERP System</h1>
+</header>
+
+<nav>
+  <ul>
+    <li><button onclick="showDashboard()">Dashboard</button></li>
+    <li><button onclick="showProducts()">Products Management</button></li>
+    <li><button onclick="showOrders()">Orders Management</button></li>
+    <li><button onclick="showCalendar()">Orders Calendar View</button></li>
+  </ul>
+</nav>
+
+<section id="dashboard" style="display: none;">
+  <h2>Dashboard</h2>
+  <div>
+    <h3>System Overview</h3>
+    <p>Total number of products: <span id="totalProducts">0</span></p>
+    <p>Total number of orders: <span id="totalOrders">0</span></p>
+  </div>
+  <div>
+    <h3>Key Metrics</h3>
+    <p>Revenue: <span id="totalRevenue">$0</span></p>
+    <p>Number of active users: <span id="activeUsers">0</span></p>
+  </div>
+  <div>
+    <h3>Recent Activities</h3>
+    <ul id="recentActivities">
+      <!-- Recent activities will be dynamically added here using JavaScript -->
+    </ul>
+  </div>
+</section>
+
+<section id="products" style="display: none;">
+  <h2>Products Management</h2>
+  <ul id="productList">
+    <!-- Product items will be dynamically added here using JavaScript -->
+  </ul>
+  <button class="primary" onclick="addProduct()">Add Product</button>
+</section>
+
+<section id="orders" style="display: none;">
+  <h2>Orders Management</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Customer Name</th>
+        <th>Order Date</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="orderList">
+      <!-- Order items will be dynamically added here using JavaScript -->
+    </tbody>
+  </table>
+</section>
+
+<section id="calendar" style="display: none;">
+  <h2>Orders Calendar View</h2>
+  <div id="calendarContainer"></div> <!-- Added calendar container -->
+</section>
+
+<script>
+  // Global variables
+  let products = [];
+  let orders = [];
+
+  // Display Products Management
+  function showProducts() {
+    hideAllSections();
+    document.getElementById('products').style.display = 'block';
+    showProductsManagement();
+  }
+
+  // Display Orders Management
+  function showOrders() {
+    hideAllSections();
+    document.getElementById('orders').style.display = 'block';
+    renderOrderList();
+  }
+  function viewOrderDetails(orderId) {
+    const order = orders.find(order => order.id === orderId);
+    if (order) {
+      alert(`Order Details:\nID: ${order.id}\nCustomer: ${order.customer}\nDate: ${order.date}\nStatus: ${order.status}\nProduct: ${order.product.name}`);
+    } else {
+      alert(`Order ${orderId} not found`);
+    }
+  }
+
+  // Hide all sections
+  function hideAllSections() {
+    const sections = document.querySelectorAll('section');
+    sections.forEach(section => {
+      section.style.display = 'none';
+    });
+  }
+
+  // Render product list in product management
+  function showProductsManagement() {
+    const productList = document.getElementById('productList');
+    productList.innerHTML = '';
+    products.forEach(product => {
+      renderProduct(product);
+    });
+  }
+  function showCalendar() {
+    hideAllSections();
+    document.getElementById('calendar').style.display = 'block';
+    renderCalendar();
+  }
+
+  // Function to render a product in the product management section
+  function renderProduct(product) {
+    const listItem = document.createElement('li');
+    listItem.innerHTML = `<strong>${product.name}</strong> - Category: ${product.category}, Price: ${product.price}, Stock: ${product.stock}`;
+    document.getElementById('productList').appendChild(listItem);
+  }
+
+  // Add a new product
+  function addProduct() {
+    const productName = prompt("Enter product name:");
+    const productCategory = prompt("Enter product category:");
+    const productPrice = prompt("Enter product price:");
+    const productStock = prompt("Enter product stock quantity:");
+
+    if (productName && productCategory && productPrice && productStock) {
+      const newProduct = { 
+        name: productName, 
+        category: productCategory, 
+        price: productPrice, 
+        stock: productStock 
+      };
+
+      // Prompt for order date
+      const orderDateStr = prompt("Enter order date (YYYY-MM-DD):");
+      const orderDate = new Date(orderDateStr);
+
+      if (isNaN(orderDate.getTime())) {
+        alert("Invalid order date. Please enter a valid date in YYYY-MM-DD format.");
+        return;
+      }
+
+      // Calculate delivery date (3 days from the order date)
+      const deliveryDate = new Date(orderDate);
+      deliveryDate.setDate(deliveryDate.getDate() + 3);
+      newProduct.deliveryDate = deliveryDate;
+
+      products.push(newProduct); // Add the new product to the global product list
+      renderProduct(newProduct); // Render the new product in product management
+      addOrderWithProduct(newProduct); // Add order with the new product
+      alert(`Product "${productName}" added successfully!`);
+    }
+  }
+
+
+  // Add order with the new product
+  function addOrderWithProduct(newProduct) {
+    const orderId = prompt("Enter order ID:");
+    const customerName = prompt("Enter customer name:");
+
+    if (orderId && customerName) {
+      const newOrder = { 
+        id: orderId, 
+        customer: customerName, 
+        date: new Date().toLocaleDateString(), // Order date is today's date
+        status: "Pending", 
+        product: newProduct 
+      };
+      
+      orders.push(newOrder); // Add the new order to the global order list
+      renderOrder(newOrder); // Render the new order in order management
+    }
+  }
+
+  // Function to display orders for a specific day (based on delivery date)
+  function displayOrdersForDay(year, month, day) {
+    const selectedDate = new Date(year, month, day);
+    const formattedDate = selectedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+    // Retrieve orders due for delivery on the selected day
+    const ordersForDay = orders.filter(order => {
+      const deliveryDate = new Date(order.product.deliveryDate);
+      return (
+        deliveryDate.getFullYear() === year &&
+        deliveryDate.getMonth() === month &&
+        deliveryDate.getDate() === day
+      );
+    });
+
+    // Display orders for the selected day
+    if (ordersForDay.length > 0) {
+      const orderIds = ordersForDay.map(order => `Order ID: ${order.id}`).join('\n');
+      alert(`Orders due for delivery on ${formattedDate}:\n${orderIds}`);
+    } else {
+      alert(`No orders due for delivery on ${formattedDate}`);
+    }
+  }
+
+  // Function to render an order in the order management section
+  function renderOrder(order) {
+    const orderList = document.getElementById('orderList');
+    const row = orderList.insertRow();
+    row.innerHTML = `
+      <td>${order.id}</td>
+      <td>${order.customer}</td>
+      <td>${order.date}</td>
+      <td id="status-${order.id}">${order.status}</td>
+      <td>
+        <button onclick="viewOrderDetails('${order.id}')">View Details</button>
+        <button onclick="updateOrderStatus('${order.id}')">Update Status</button>
+        <button onclick="deleteOrder('${order.id}')">Delete</button>
+      </td>
+    `;
+  }
+
+  // Update order status
+  function updateOrderStatus(orderId) {
+    const order = orders.find(order => order.id === orderId);
+    if (order) {
+      const newStatus = prompt(`Enter new status for order ${orderId}:`);
+      if (newStatus) {
+        order.status = newStatus;
+        const statusCell = document.getElementById(`status-${orderId}`);
+        if (statusCell) {
+          statusCell.textContent = newStatus;
+        }
+        alert(`Order ${orderId} status updated to: ${newStatus}`);
+      }
+    } else {
+      alert(`Order ${orderId} not found`);
+    }
+  }
+
+  // Function to delete an order
+  function deleteOrder(orderId) {
+    const index = orders.findIndex(order => order.id === orderId);
+    if (index !== -1) {
+      orders.splice(index, 1);
+      renderOrderList();
+      alert(`Order ${orderId} deleted successfully!`);
+    } else {
+      alert(`Order ${orderId} not found`);
+    }
+  }
+
+  // Function to render the order list
+  function renderOrderList() {
+    const orderList = document.getElementById('orderList');
+    orderList.innerHTML = '';
+    orders.forEach(order => {
+      renderOrder(order);
+    });
+  }
+
+  // Display Dashboard
+  function showDashboard() {
+    hideAllSections();
+    document.getElementById('dashboard').style.display = 'block';
+    updateDashboardMetrics();
+  }
+
+  // Update dashboard metrics
+  function updateDashboardMetrics() {
+    document.getElementById('totalProducts').innerText = products.length;
+    document.getElementById('totalOrders').innerText = orders.length;
+    const totalRevenue = calculateTotalRevenue(); // Example function to calculate total revenue
+    document.getElementById('totalRevenue').innerText = `$${totalRevenue}`;
+    const activeUsers = calculateActiveUsers(); // Example function to calculate active users
+    document.getElementById('activeUsers').innerText = activeUsers;
+    const recentActivities = getRecentActivities(); // Example function to get recent activities
+    const recentActivitiesList = document.getElementById('recentActivities');
+    recentActivitiesList.innerHTML = '';
+    recentActivities.forEach(activity => {
+      const listItem = document.createElement('li');
+      listItem.textContent = activity;
+      recentActivitiesList.appendChild(listItem);
+    });
+  }
+
+  // Example functions for calculations and data retrieval
+  function calculateTotalRevenue() {
+    // Logic to calculate total revenue
+    return 5000; // Example value
+  }
+
+  function calculateActiveUsers() {
+    // Logic to calculate active users
+    return 100; // Example value
+  }
+
+  function getRecentActivities() {
+    // Logic to retrieve recent activities
+    return ['User logged in', 'New order placed', 'Product added']; // Example activities
+  }
+  function renderCalendar() {
+    const calendarContainer = document.getElementById('calendarContainer');
+    const calendar = document.createElement('table');
+    calendar.classList.add('calendar');
+
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // Get total days in the current month
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // Get day of the week of the first day
+
+    // Render month and year
+    const monthYearRow = calendar.insertRow();
+    const monthYearCell = monthYearRow.insertCell();
+    monthYearCell.colSpan = '7';
+    monthYearCell.textContent = `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(today)} ${currentYear}`;
+    monthYearCell.style.textAlign = 'center';
+
+    // Render day headers
+    const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const headerRow = calendar.insertRow();
+    dayLabels.forEach(day => {
+      const cell = headerRow.insertCell();
+      cell.textContent = day;
+    });
+
+    // Fill empty cells for days before the first day of the month
+    const firstWeek = calendar.insertRow();
+    for (let i = 7; i < firstDayOfMonth; i++) {
+      firstWeek.insertCell();
+    }
+
+    // Render days of the month
+    let currentDay = 1;
+    let currentWeek = firstWeek;
+    for (let day = 1; day <= daysInMonth; day++) {
+      if (currentDay > 1 && currentDay % 7 === 1) {
+        currentWeek = calendar.insertRow();
+      }
+      const cell = currentWeek.insertCell();
+      cell.textContent = day;
+      cell.addEventListener('click', () => {
+        displayOrdersForDay(currentYear, currentMonth, day);
+      });
+
+      // Check if the current day corresponds to a due date
+      const dueDate = new Date(currentYear, currentMonth, day);
+      const isDueDate = orders.some(order => {
+        const deliveryDate = new Date(order.product.deliveryDate);
+        return (
+          deliveryDate.getFullYear() === dueDate.getFullYear() &&
+          deliveryDate.getMonth() === dueDate.getMonth() &&
+          deliveryDate.getDate() === dueDate.getDate()
+        );
+      });
+
+      if (isDueDate) {
+        cell.classList.add('due-date');
+      }
+
+      currentDay++;
+    }
+
+    calendarContainer.innerHTML = '';
+    calendarContainer.appendChild(calendar);
+  }
+
+
+  // Function to display orders for a specific day
+  // Function to display orders for a specific day
+function displayOrdersForDay(year, month, day) {
+  const selectedDate = new Date(year, month, day);
+  const formattedDate = selectedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+  // Retrieve orders due for delivery on the selected day
+  const ordersForDay = orders.filter(order => {
+    const deliveryDate = new Date(order.product.deliveryDate);
+    return (
+      deliveryDate.getFullYear() === year &&
+      deliveryDate.getMonth() === month &&
+      deliveryDate.getDate() === day
+    );
+  });
+
+  // Display orders for the selected day
+  if (ordersForDay.length > 0) {
+    const orderIds = ordersForDay.map(order => `Order ID: ${order.id}`).join('\n');
+    alert(`Orders due for delivery on ${formattedDate}:\n${orderIds}`);
+  } else {
+    alert(`No orders due for delivery on ${formattedDate}`);
+  }
+}
+
+
+  // Function to populate orders with deliveryDate property
+  function populateOrdersWithDeliveryDate() {
+    // Example: Add deliveryDate property to each order based on order date and estimated delivery time
+    orders.forEach(order => {
+      const orderDate = new Date(order.date);
+      const deliveryDate = new Date(orderDate.setDate(orderDate.getDate() + 3)); // Assuming delivery in 3 days
+      order.deliveryDate = deliveryDate;
+    });
+  }
+
+  // Call function to populate orders with deliveryDate property
+  populateOrdersWithDeliveryDate();
+
+</script>
+
+</body>
+</html>
