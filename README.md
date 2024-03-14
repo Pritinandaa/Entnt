@@ -20,18 +20,13 @@ Interacting with the Website:
 
 # Screenshots
 
-
-![ERP1](https://github.com/Bishal-Jena04/entnt/assets/136837415/b11bf421-a9bf-4eb8-8936-7570397cb198)
-
-![ERP](https://github.com/Bishal-Jena04/entnt/assets/136837415/40451c8d-5c0b-49b4-95e6-a1340bcf4201)
-
-![ERP2](https://github.com/Bishal-Jena04/entnt/assets/136837415/c6607990-3ea1-4137-bc65-dd1b34384d63)
-
-![ERP3](https://github.com/Bishal-Jena04/entnt/assets/136837415/90c2e421-0c51-4560-8c38-cc95c49a3fc3)
+![Screenshot](https://github.com/Pritinandaa/Entnt/assets/153268106/e9c678db-43d4-4098-ad22-8db815f1a18c)
+![product 2](https://github.com/Pritinandaa/Entnt/assets/153268106/01a6619d-24eb-47b1-a1a7-cc775f2f7b11)
+![Order details](https://github.com/Pritinandaa/Entnt/assets/153268106/1a4a2a35-78e5-4351-87ed-494ea940a915)
+![calender](https://github.com/Pritinandaa/Entnt/assets/153268106/52615932-e617-45cd-9734-679b36dd59d2)
 
 
 To view the ERP System Interface, Kindly refer to the below attached link:
 
-https://github.com/Pritinandaa
-
+https://pritinandaa.github.io/Entnt/
 
